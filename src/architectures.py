@@ -181,7 +181,7 @@ def master_training_orchestrator(X, y):
         ensemble = build_stacking_ensemble(ml_models)
         ensemble.fit(X_train,y_train)
 
-        ens_preds = ensemble.predict(x_val)
+        ens_preds = ensemble.predict(X_val)
         ens_probs = ensemble.predict_proba(X_val)[:,1]
 
         metrics['Voting Ensemble'] = {
