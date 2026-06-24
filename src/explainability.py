@@ -67,6 +67,38 @@ def generate_shap_explanation(model, X_train, input_scaled, feature_names, model
             sv = shap_values[0][:, 1] if shap_values[0].ndim >1 else shap_values[0]
             expected_value = explainer.expected_value[1] if isinstance(explainer.expected_value, (list, np.ndarray)) else explainer.expected_value
 
+            #unified shap parsing logic
+            #parse to shap value for contributions
+        if isinstance(shap_values, list):
+            #we want for class 1 or main for 0
+            if len(shap_values) > 1:
+                sv = shap_values[1]
+            else:
+                sv=shap_values[0]
+            #if the array is 2d extract the first sample
+            if isinstance(sv, np.ndarray) and sv.ndim == 2:
+                sv = sv[0]
+            elif isinstance(shap_values, np.ndarray):
+                if shap_values.ndim ==3:
+                    if shap_values.shape[2]>1:
+                        sv=shap_values[0, :, 1]
+                    else:
+                        sv=shap_values[0,:,0]
+                elif shap_values.ndim==2:
+                    sv=shap_values[0]
+                else:
+                    sv = shap_values
+        else:
+            sv=shap_values
+
+        #parse to get 1 
+        if isinstance(expected_value, (list, np.ndarray)):
+            #if has more than two
+            if len(expected_value) > 1:
+                expected_value = expected_value[1]
+            elif len(expected_value) > 0:
+                expected_value = expected_value[0]
+
 
         #Building waterfall chart
     print("Shap values calculated, building waterfall chart")
