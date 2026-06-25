@@ -84,7 +84,7 @@ def absolute_preprocessing_pipeline(filepath):
         print(f" Type is: {col_type}")
 
         #check for missing value
-        missing_count = df[col].isnull().sum
+        missing_count = df[col].isnull().sum()
         print(f"Number of missing values: {missing_count}")
 
         if col_type in ['int64','float64']:
@@ -168,7 +168,7 @@ def absolute_preprocessing_pipeline(filepath):
         print(f"{col}")
 
         #we need the list of all unique options
-        option_list= X_df[col].unique.tolist()
+        option_list= X_df[col].unique().tolist()
         mode_val= X_df[col].mode()[0]
 
         ui_config[col] = {
@@ -181,7 +181,7 @@ def absolute_preprocessing_pipeline(filepath):
     #computer cannot understand characters 
     #so we change them into computer understanding code
     print("Step 6 Performing One hot encoding on categorical columns")
-    X_encoded = pd.get_dummies(X_df, columns=cat_cols, drop_first=True)\
+    X_encoded = pd.get_dummies(X_df, columns=cat_cols, drop_first=True)
     
     #We save the names of the final columns after encoding
     feature_names = X_encoded.columns.to_list()
