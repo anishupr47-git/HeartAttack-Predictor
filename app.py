@@ -161,14 +161,18 @@ with tab3:
                 )
             # If the feature is numerical, we use a number input box
             else:
+                min_val = float(bound['min'])
+                max_val = float(bound['max'])
                 start_val = 0.0
-                if start_val < bound['min']:
-                    start_val = float(bound['min'])
+                if start_val < min_val:
+                    start_val = min_val
+                elif start_val > max_val:
+                    start_val = max_val
                     
                 input_data[feature] = st.number_input(
                     label=feature,
-                    min_value=bound['min'],
-                    max_value=bound['max'],
+                    min_value=min_val,
+                    max_value=max_val,
                     value=start_val,
                     key=f"input_{feature}"
                 )
