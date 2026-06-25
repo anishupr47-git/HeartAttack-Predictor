@@ -104,7 +104,7 @@ def build_stacking_ensemble(models_dict):
     """
     estimators = [
         ('rf', models_dict['Random Forest']),
-        ('xgb', models_dict['XGBoost'])
+        ('xgb', models_dict['XGBoost']),
         ('lr', models_dict['Logistic Regression'])
     ]
     return VotingClassifier(estimators=estimators, voting='soft')
@@ -161,7 +161,7 @@ def master_training_orchestrator(X, y):
         #calculate probability
         if hasattr(model, 'predict_proba'):
             probs= model.predict_proba(X_val)[:,1]
-            roc_auc = float(roc_auc_score(y_val,preds))
+            roc_auc = float(roc_auc_score(y_val, probs))
         else:
             roc_auc = float(roc_auc_score(y_val, preds))
 
@@ -176,15 +176,15 @@ def master_training_orchestrator(X, y):
         }
         trained_models[name] = model
 
-        #Training voting
-        print("Training 12/12: Soft voting ensemble")
-        ensemble = build_stacking_ensemble(ml_models)
-        ensemble.fit(X_train,y_train)
+    #Training voting
+    print("Training 12/12: Soft voting ensemble")
+    ensemble = build_stacking_ensemble(ml_models)
+    ensemble.fit(X_train,y_train)
 
-        ens_preds = ensemble.predict(X_val)
-        ens_probs = ensemble.predict_proba(X_val)[:,1]
+    ens_preds = ensemble.predict(X_val)
+    ens_probs = ensemble.predict_proba(X_val)[:,1]
 
-        metrics['Voting Ensemble'] = {
+    metrics['Voting Ensemble'] = {
         'Accuracy': float(accuracy_score(y_val, ens_preds)),
         'F1-Score': float(f1_score(y_val, ens_preds)),
         'Precision': float(precision_score(y_val, ens_preds)),
