@@ -4,7 +4,7 @@ import numpy as np
 import os
 import time
 
-from src src.cleaning import absolute_preprocessing_pipeline, generate_eda_stats
+from src.cleaning import absolute_preprocessing_pipeline, generate_eda_stats
 from src.architectures import master_training_orchestrator
 from src.visualizations import plot_confusion_matrix, plot_metrics_comparison, plot_eda_target_distribution
 from src.explainability import generate_shap_explanation
@@ -141,23 +141,34 @@ with tab3:
     input_cols = st.columns(4)
     raw_features = list(ui_config.keys())
 
-    for idx, features in enumerate(raw_features):
-        col= input_cols[idx%4]
+    for idx, feature in enumerate(raw_features):
+        col = input_cols[idx % 4]
         bound = ui_config[feature]
-
+        
         with col:
-            #if it is categorical
+            # If the feature is categorical (text), we use a dropdown box
             if bound['type'] == 'categorical':
                 opts = bound['options']
-                mode_val= bound['mode']
-
-                #keep all value to 0
-                default_idx = 0
-
+                mode_val = bound['mode']
+                
+                default_idx = 0 
+                
+                input_data[feature] = st.selectbox(
+                    label=feature, 
+                    options=opts, 
+                    index=default_idx,
+                    key=f"input_{feature}"
+                )
+            # If the feature is numerical, we use a number input box
+            else:
+                start_val = 0.0
+                if start_val < bound['min']:
+                    start_val = float(bound['min'])
+                    
                 input_data[feature] = st.number_input(
                     label=feature,
                     min_value=bound['min'],
-                    max_value=bound['max']
+                    max_value=bound['max'],
                     value=start_val,
                     key=f"input_{feature}"
                 )
@@ -208,9 +219,9 @@ with tab3:
                     prob = float(model.predict(input_scaled)[0])
                 pred = int(model.predict(input_scaled)[0])
             else:
-                #fallnacl for models
-                pred= int(models.predict(input_scaled)[0])
-                prob=float(pred)
+                #fallback for models
+                pred = int(model.predict(input_scaled)[0])
+                prob = float(pred)
 
             st.write("Generating SHAP explainibility")
             try:
