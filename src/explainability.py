@@ -138,7 +138,7 @@ def generate_shap_explanation(model, X_train, input_scaled, feature_names, model
     ))
 
     #Final Touches to the chart
-    fig.upate_layout(
+    fig.update_layout(
         title=f"Prediction Explainability (SHAP Top 10 features) - Base Value: {float(expected_value):.3f}",
         showlegend=False,
         height=500,
