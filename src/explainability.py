@@ -100,11 +100,12 @@ def generate_shap_explanation(model, X_train, input_scaled, feature_names, model
                 expected_value = expected_value[0]
 
 
-        #Building waterfall chart
+    #Building waterfall chart
     print("Shap values calculated, building waterfall chart")
     
     #make sure to make it a flat list of nums
     sv = np.array(sv).flatten()
+    expected_value = float(expected_value)
 
     #we show the top 10 values to make it valid
     #np.argsort sorts number from low to high
@@ -116,21 +117,25 @@ def generate_shap_explanation(model, X_train, input_scaled, feature_names, model
     top_features = [feature_names[i] for i in indices]
     top_sv = sv[indices]
 
-    #prepare the text for chat
-    text= [f"{val:+.3f}" for val in top_sv]
+    other_sv = np.sum(sv) - np.sum(top_sv)
 
-    #every step in a waterfall chart
-    measure = ["relative"] * len(top_sv)
+    chart_x = ["Base Value"] + top_features + ["Other Features", "Prediction"]
+    chart_y = [expected_value] + list(top_sv) + [other_sv, 0]
+    measure = ["absolute"] + (["relative"] * len(top_sv)) + ["relative", "total"]
+
+    final_pred = expected_value + np.sum(sv)
+    #prepare the text for chat
+    text = [f"{expected_value:.3f}"] + [f"{val:+.3f}" for val in top_sv] + [f"{other_sv:+.3f}", f"{final_pred:.3f}"]
 
     #build plotly figure
     fig = go.Figure(go.Waterfall(
         name="SHAP Explainability",
         orientation="v",
         measure=measure,
-        x=top_features,
+        x=chart_x,
         textposition="outside",
         text=text,
-        y=top_sv,
+        y=chart_y,
         connector={"line": {"color": "rgb(63, 63, 63)"}}, 
         decreasing={"marker": {"color": "MediumTurquoise"}}, 
         increasing={"marker": {"color": "Crimson"}},         

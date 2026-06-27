@@ -152,8 +152,11 @@ def absolute_preprocessing_pipeline(filepath):
         #User requirement
         if col == 'Age':
             print("Number should fall under min and max value")
-            min_val=1.0
-            max_val=150
+            min_val = 1.0
+            max_val = 150.0
+        else:
+            min_val = 0.0
+            max_val = max_val + 50.0
 
         ui_config[col] = {
             'type': 'continious',
